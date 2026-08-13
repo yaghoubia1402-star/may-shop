@@ -5,3 +5,11 @@
 .send-title{font-weight:700;margin:14px 0 10px}.send-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.send-grid button{border:0;border-radius:10px;padding:12px;cursor:pointer;background:#f2f2f2;font-weight:700}.send-grid button:hover{filter:brightness(.96)}
 
 #orderForm{margin-top:14px}.show-form{display:block!important}
+
+.status{margin-top:12px;min-height:24px;font-weight:bold}.status.success{color:#087f23}.status.error{color:#a40000}
+.order-tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:15px}
+.order-card{border:1px solid #e5e5e5;border-radius:16px;padding:16px;margin:12px 0;background:#fafafa;line-height:1.9}
+.order-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:8px}
+.order-bottom{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.order-bottom b{margin-left:auto}.order-bottom select{border:1px solid #ddd;border-radius:10px;padding:9px;background:#fff}
+.success-box{background:#e9f8ec;color:#176b2b;border-radius:12px;padding:12px;line-height:1.9}.error-box{background:#fff0f0;color:#a40000;border-radius:12px;padding:12px;line-height:1.9}
