@@ -22,7 +22,7 @@ function imgSrc(src){ return src || "assets/coffee.svg"; }
 
 async function loadProducts(){
   try{
-    const r=await fetch("/api/products",{cache:"no-store"});
+    const r=await fetch(API_BASE+"/api/products",{cache:"no-store",headers:{"accept":"application/json"}});
     const data=await r.json();
     if(data.ok && Array.isArray(data.products)){
       products=data.products;
@@ -155,7 +155,7 @@ $("orderForm").addEventListener("submit",async e=>{
 
   result.textContent="در حال ثبت سفارش در مدیریت...";
   try{
-    const r=await fetch("/api/orders",{
+    const r=await fetch(API_BASE+"/api/orders",{
       method:"POST",
       headers:{"content-type":"application/json"},
       body:JSON.stringify(data)

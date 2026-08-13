@@ -13,7 +13,9 @@ const fa=n=>new Intl.NumberFormat("fa-IR").format(n);
 const safe=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
 async function api(path,options={}){
-  const r=await fetch(path,{cache:"no-store",...options});
+  const target=(/^https?:\/\//i.test(path)?path:API_BASE+path);
+  const headers={"accept":"application/json",...(options.headers||{})};
+  const r=await fetch(target,{cache:"no-store",...options,headers});
   const data=await r.json().catch(()=>({ok:false,error:"پاسخ نامعتبر سرور"}));
   if(!r.ok||data.ok===false) throw new Error(data.error||"خطای سرور");
   return data;
@@ -122,8 +124,6 @@ async function loadOrders(){
  const list=$("ordersList");
  list.innerHTML="<p>در حال دریافت سفارش‌ها...</p>";
  try{
-  const health=await api("/api/health");
-  if(!health.storage) throw new Error("ORDERS_KV به Worker متصل نیست.");
   const data=await api("/api/orders");
   orders=Array.isArray(data.orders)?data.orders:[];
   renderOrders();

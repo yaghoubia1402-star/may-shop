@@ -11,7 +11,13 @@ const MAX_ORDERS = 500;
 
 const json = (data, status=200) => new Response(JSON.stringify(data), {
   status,
-  headers: {"content-type":"application/json; charset=utf-8", "cache-control":"no-store"}
+  headers: {
+    "content-type":"application/json; charset=utf-8",
+    "cache-control":"no-store",
+    "access-control-allow-origin":"*",
+    "access-control-allow-methods":"GET,POST,PUT,PATCH,DELETE,OPTIONS",
+    "access-control-allow-headers":"content-type,accept"
+  }
 });
 
 async function readJSON(env, key, fallback) {
@@ -45,6 +51,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/api/")) {
+      if (request.method === "OPTIONS") return new Response(null,{status:204,headers:{"access-control-allow-origin":"*","access-control-allow-methods":"GET,POST,PUT,PATCH,DELETE,OPTIONS","access-control-allow-headers":"content-type,accept","access-control-max-age":"86400"}});
       try {
         if (url.pathname === "/api/health" && request.method === "GET") {
           return json({ok:true, storage:!!(env.ORDERS_KV || env.MAY_DATA)});

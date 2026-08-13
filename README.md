@@ -1,56 +1,27 @@
-# MAY.SHOP FINAL v4
+# MAY.SHOP FINAL v7
 
-این نسخه برای فروشگاه واقعی با ثبت سفارش مشترک آماده شده است.
+این نسخه معماری صحیح Pages + Worker را دارد: رابط فروشگاه و پنل می‌توانند روی Pages باشند، اما همه محصولات و سفارش‌ها از API مرکزی Worker و KV مشترک خوانده/ذخیره می‌شوند.
 
-## امکانات
-- عکس محصولات
-- افزودن به سبد خرید
-- جستجو و دسته‌بندی
-- افزودن/ویرایش/حذف محصول در مدیریت
-- ذخیره مشترک محصولات
-- ثبت سفارش مشتری در سرور
-- نمایش سفارش‌های جدید در مدیریت
-- وضعیت سفارش: جدید، در حال بررسی، آماده ارسال، ارسال شد، لغو شد
-- حذف سفارش از مدیریت
-- نمایش نام، موبایل، آدرس، محصولات، تعداد و مبلغ
-- ارسال سفارش در واتساپ، بله، ایتا و روبیکا
-- خالی شدن سبد پس از ثبت موفق
-- API سلامت در `/api/health`
+## تنظیم ضروری Cloudflare
+Worker باید `may-shop` باشد و Binding زیر را داشته باشد:
+- Type: KV namespace
+- Variable name: `ORDERS_KV`
+- Namespace: `may-shop-orders`
 
-## یک تنظیم ضروری Cloudflare
-برای اینکه سفارش مشتری واقعاً به مدیریت برسد، باید یک Workers KV به Worker وصل شود.
-
-در Cloudflare:
-1. Workers & Pages
-2. Worker `may-shop`
-3. یک KV Namespace بسازید (مثلاً `MAY-SHOP-DATA`)
-4. وارد Worker شوید → **Settings → Bindings**
-5. **Add binding → KV namespace**
-6. در **Variable name** دقیقاً بنویسید:
-   `MAY_DATA`
-7. KV ساخته‌شده را انتخاب کنید.
-8. Save/Deploy را بزنید.
-
-طبق مستندات Cloudflare، KV binding از طریق Dashboard قابل اضافه‌کردن است و بعد از اتصال، Worker از `env.MAY_DATA` استفاده می‌کند.
+تست اتصال:
+`https://may-shop.yaghoubia1402.workers.dev/api/health`
+باید `storage:true` نشان دهد.
 
 ## استقرار
-در GitHub همین فایل‌ها را جایگزین کنید و Cloudflare Build را اجرا کنید.
+1. همه محتویات این ZIP را در همان GitHub repository جایگزین کنید.
+2. Commit changes بزنید.
+3. Cloudflare Pages باید Commit جدید را Deploy کند.
+4. Worker نیز باید از `worker.js` نسخه v7 Deploy شده باشد.
 
-Build command:
-خالی
+نکته: دیگر نباید انتظار داشت `/api/*` روی Pages خودش KV داشته باشد؛ فایل‌های `app.js` و `admin.js` مستقیماً به API مرکزی Worker متصل‌اند.
 
-Deploy command:
-`npx wrangler deploy`
+## آدرس API مرکزی
+`https://may-shop.yaghoubia1402.workers.dev`
 
-## آدرس نهایی مشتری
-برای این نسخه که با Worker و API مشترک اجرا می‌شود، آدرس اصلی انتشار:
-`https://may-shop.yaghoubi1402.workers.dev`
-
-اگر بعداً دامنه اختصاصی وصل شود، همان دامنه را می‌توان آدرس نهایی مشتری کرد.
-
-## شماره‌های ارسال
-شماره فروشگاه در `config.js` تنظیم شده است:
-- واتساپ: 989122468958
-- بله: 09122468958
-- ایتا: 09122468958
-- روبیکا: 09122468958
+## مشخصات فروشگاه
+MAY.SHOP — 09122468958
