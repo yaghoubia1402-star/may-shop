@@ -1,8 +1,9 @@
-MAY.SHOP v8
+MAY.SHOP v10
 - Shared products/orders via ORDERS_KV
+- Admin login required; /admin is always a fresh login gate
 - No payment gateway
 - Payment instructions after order
 - Bale only for sending payment tracking number
-- Admin protected by login
 Default admin password: MAY@09122468958#Admin
-Change ADMIN_PASSWORD in worker.js before production if desired.
+
+IMPORTANT: In Cloudflare Workers > may-shop > Bindings, the KV namespace named may-shop-orders must be connected with variable name ORDERS_KV. After changing a binding, deploy the Worker again. Open /api/health and confirm storage:true and binding:"ORDERS_KV".

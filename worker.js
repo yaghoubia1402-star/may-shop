@@ -66,7 +66,7 @@ export default {
       if (request.method === "OPTIONS") return new Response(null,{status:204,headers:{"access-control-allow-origin":"*","access-control-allow-methods":"GET,POST,PUT,PATCH,DELETE,OPTIONS","access-control-allow-headers":"content-type,accept","access-control-max-age":"86400"}});
       try {
         if (url.pathname === "/api/health" && request.method === "GET") {
-          return json({ok:true, storage:!!(env.ORDERS_KV || env.MAY_DATA)});
+          return json({ok:true, storage:!!(env.ORDERS_KV || env.MAY_DATA), binding:env.ORDERS_KV?"ORDERS_KV":(env.MAY_DATA?"MAY_DATA":null)});
         }
 
         if (url.pathname === "/api/admin/login" && request.method === "POST") {
@@ -183,7 +183,12 @@ export default {
       }
     }
 
-    if (url.pathname === "/admin" || url.pathname === "/admin.html") {
+    if (url.pathname === "/admin") {
+      // /admin is always the login gate; this prevents an old browser session
+      // from silently opening the management panel.
+      return new Response(`<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ورود مدیریت MAY.SHOP</title><style>body{font-family:sans-serif;background:#f6f6f6;display:grid;place-items:center;min-height:100vh;margin:0}.box{background:#fff;padding:28px;border-radius:18px;box-shadow:0 10px 30px #0001;width:min(90%,360px)}input,button{width:100%;padding:13px;margin-top:10px;box-sizing:border-box;border-radius:10px;border:1px solid #ddd}button{cursor:pointer;background:#111;color:#fff}.err{color:#b00020;margin-top:10px}</style><div class="box"><h2>MAY.SHOP</h2><p>ورود مدیریت فروشگاه</p><input id="p" type="password" autocomplete="current-password" placeholder="رمز مدیریت"><button onclick="login()">ورود</button><div id="e" class="err"></div></div><script>async function login(){const e=document.getElementById("e");e.textContent="";const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify({password:document.getElementById("p").value})});const d=await r.json();if(d.ok)location.href="/admin.html";else e.textContent=d.error||"ورود ناموفق بود."}</script></html>`, {headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store","set-cookie":`${ADMIN_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`}});
+    }
+    if (url.pathname === "/admin.html") {
       if (!hasAdmin(request)) {
         return new Response(`<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ورود مدیریت MAY.SHOP</title><style>body{font-family:sans-serif;background:#f6f6f6;display:grid;place-items:center;min-height:100vh;margin:0}.box{background:#fff;padding:28px;border-radius:18px;box-shadow:0 10px 30px #0001;width:min(90%,360px)}input,button{width:100%;padding:13px;margin-top:10px;box-sizing:border-box;border-radius:10px;border:1px solid #ddd}button{cursor:pointer;background:#111;color:#fff}.err{color:#b00020;margin-top:10px}</style><div class="box"><h2>MAY.SHOP</h2><p>ورود مدیریت فروشگاه</p><input id="p" type="password" placeholder="رمز مدیریت"><button onclick="login()">ورود</button><div id="e" class="err"></div></div><script>async function login(){const e=document.getElementById("e");e.textContent="";const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password:document.getElementById("p").value})});const d=await r.json();if(d.ok)location.href="/admin.html";else e.textContent=d.error||"ورود ناموفق بود."}</script></html>`, {headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
       }
