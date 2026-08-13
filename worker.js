@@ -1,8 +1,8 @@
 const DEFAULT_PRODUCTS = [
-  {id:1,name:"زعفران ممتاز",price:2500000,category:"زعفران",image:"assets/zafaran.svg"},
-  {id:2,name:"ادویه مخصوص",price:180000,category:"ادویه",image:"assets/advieh.svg"},
-  {id:3,name:"شربت زعفران",price:220000,category:"شربت",image:"assets/sharbat.svg"},
-  {id:4,name:"قهوه فوری",price:150000,category:"قهوه",image:"assets/coffee.svg"}
+  {id:1,name:"زعفران ممتاز",price:2500000,category:"زعفران",description:"زعفران ممتاز با کیفیت بالا.",image:"assets/zafaran.svg"},
+  {id:2,name:"ادویه مخصوص",price:180000,category:"ادویه",description:"ادویه مخصوص و خوش‌عطر.",image:"assets/advieh.svg"},
+  {id:3,name:"شربت زعفران",price:220000,category:"شربت",description:"شربت زعفران خوش‌طعم.",image:"assets/sharbat.svg"},
+  {id:4,name:"قهوه فوری",price:150000,category:"قهوه",description:"قهوه فوری خوش‌عطر و مناسب مصرف روزانه.",image:"assets/coffee.svg"}
 ];
 
 const PRODUCT_KEY = "products";
@@ -54,6 +54,7 @@ function normalizeProduct(p, index=0) {
     name: String(p?.name || "").trim(),
     price: Math.max(0, Number(p?.price) || 0),
     category: String(p?.category || "").trim(),
+    description: String(p?.description || "").trim(),
     image: String(p?.image || "assets/coffee.svg")
   };
 }
@@ -100,14 +101,14 @@ export default {
           if (request.method !== "GET" && !hasAdmin(request)) return adminResponse();
           if (request.method === "GET") {
             const products = await readJSON(env, PRODUCT_KEY, DEFAULT_PRODUCTS);
-            return json({ok:true, products});
+            return json({ok:true, products: products.map(normalizeProduct)});
           }
           if (request.method === "PUT") {
             const body = await request.json();
             if (!Array.isArray(body.products)) return json({ok:false,error:"products must be an array"},400);
             const products = body.products.map(normalizeProduct);
             await writeJSON(env, PRODUCT_KEY, products);
-            return json({ok:true, products});
+            return json({ok:true, products: products.map(normalizeProduct)});
           }
         }
 
@@ -127,7 +128,16 @@ export default {
               return json({ok:false,error:"اطلاعات سفارش کامل نیست."},400);
             }
 
-            const total = Math.max(0, Number(body.total)||0);
+            const products = await readJSON(env, PRODUCT_KEY, DEFAULT_PRODUCTS);
+            const productMap = new Map(products.map(p=>[Number(p.id), p]));
+            const cleanItems = items.map(x=>{
+              const p = productMap.get(Number(x.id));
+              if(!p) return null;
+              const qty = Math.max(1, Math.floor(Number(x.qty)||1));
+              return {id:Number(p.id),name:String(p.name||x.name||"").slice(0,200),qty,price:Math.max(0,Number(p.price)||0)};
+            }).filter(Boolean);
+            if(!cleanItems.length) return json({ok:false,error:"محصولات سفارش معتبر نیستند."},400);
+            const total = cleanItems.reduce((sum,x)=>sum + x.price*x.qty,0);
             const now = new Date().toISOString();
             const order = {
               id: "MAY-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2,7).toUpperCase(),
@@ -138,12 +148,7 @@ export default {
                 phone: String(customer.phone).trim().slice(0,40),
                 address: String(customer.address).trim().slice(0,1000)
               },
-              items: items.map(x=>({
-                id:Number(x.id)||0,
-                name:String(x.name||"").slice(0,200),
-                qty:Math.max(1,Number(x.qty)||1),
-                price:Math.max(0,Number(x.price)||0)
-              })),
+              items: cleanItems,
               total
             };
 

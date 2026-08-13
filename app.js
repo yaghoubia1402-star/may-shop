@@ -1,8 +1,8 @@
 const DEFAULT_PRODUCTS=[
-{id:1,name:"زعفران ممتاز",price:2500000,category:"زعفران",image:"assets/zafaran.svg"},
-{id:2,name:"ادویه مخصوص",price:180000,category:"ادویه",image:"assets/advieh.svg"},
-{id:3,name:"شربت زعفران",price:220000,category:"شربت",image:"assets/sharbat.svg"},
-{id:4,name:"قهوه فوری",price:150000,category:"قهوه",image:"assets/coffee.svg"}];
+{id:1,name:"زعفران ممتاز",price:2500000,category:"زعفران",description:"زعفران ممتاز با کیفیت بالا.",image:"assets/zafaran.svg"},
+{id:2,name:"ادویه مخصوص",price:180000,category:"ادویه",description:"ادویه مخصوص و خوش‌عطر.",image:"assets/advieh.svg"},
+{id:3,name:"شربت زعفران",price:220000,category:"شربت",description:"شربت زعفران خوش‌طعم.",image:"assets/sharbat.svg"},
+{id:4,name:"قهوه فوری",price:150000,category:"قهوه",description:"قهوه فوری خوش‌عطر و مناسب مصرف روزانه.",image:"assets/coffee.svg"}];
 
 let products=JSON.parse(localStorage.getItem("may_products")||"null")||DEFAULT_PRODUCTS;
 let cart=JSON.parse(localStorage.getItem("may_cart")||"[]");
@@ -53,6 +53,7 @@ function renderProducts(){
         <h3>${safe(p.name)}</h3>
         <div class="cat">دسته: ${safe(p.category)}</div>
         <div class="price">${money(p.price)}</div>
+        <details class="details"><summary>توضیحات محصول</summary><p>${safe(p.description||"برای اطلاعات بیشتر با فروشگاه تماس بگیرید.")}</p></details>
         <button class="primary" onclick="addToCart(${Number(p.id)})">🛒 افزودن به سبد</button>
       </div>
     </article>`).join("");

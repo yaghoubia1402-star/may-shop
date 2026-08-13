@@ -1,8 +1,8 @@
 const DEFAULT_PRODUCTS=[
-{id:1,name:"زعفران ممتاز",price:2500000,category:"زعفران",image:"assets/zafaran.svg"},
-{id:2,name:"ادویه مخصوص",price:180000,category:"ادویه",image:"assets/advieh.svg"},
-{id:3,name:"شربت زعفران",price:220000,category:"شربت",image:"assets/sharbat.svg"},
-{id:4,name:"قهوه فوری",price:150000,category:"قهوه",image:"assets/coffee.svg"}];
+{id:1,name:"زعفران ممتاز",price:2500000,category:"زعفران",description:"زعفران ممتاز با کیفیت بالا.",image:"assets/zafaran.svg"},
+{id:2,name:"ادویه مخصوص",price:180000,category:"ادویه",description:"ادویه مخصوص و خوش‌عطر.",image:"assets/advieh.svg"},
+{id:3,name:"شربت زعفران",price:220000,category:"شربت",description:"شربت زعفران خوش‌طعم.",image:"assets/sharbat.svg"},
+{id:4,name:"قهوه فوری",price:150000,category:"قهوه",description:"قهوه فوری خوش‌عطر و مناسب مصرف روزانه.",image:"assets/coffee.svg"}];
 
 let products=JSON.parse(localStorage.getItem("may_products")||"null")||DEFAULT_PRODUCTS;
 let orders=[];
@@ -78,7 +78,7 @@ async function del(id){
 
 function editProduct(id){
  const p=products.find(x=>x.id===id);if(!p)return;
- $("editId").value=p.id;$("name").value=p.name;$("price").value=p.price;$("cat").value=p.category;
+ $("editId").value=p.id;$("name").value=p.name;$("price").value=p.price;$("cat").value=p.category;$("description").value=p.description||"";
  $("imageUrl").value=p.image&&p.image.startsWith("http")?p.image:"";
  $("formTitle").textContent="ویرایش محصول";$("submitBtn").textContent="ذخیره تغییرات";
  window.scrollTo({top:0,behavior:"smooth"});
@@ -110,7 +110,7 @@ $("productForm").addEventListener("submit",async e=>{
  let image=$("imageUrl").value.trim()||"assets/coffee.svg";
  const file=$("imageFile").files[0];
  if(file) image=await readImage(file);
- const item={id:id?Number(id):Date.now(),name:$("name").value.trim(),price:Number($("price").value),category:$("cat").value.trim(),image};
+ const item={id:id?Number(id):Date.now(),name:$("name").value.trim(),price:Number($("price").value),category:$("cat").value.trim(),description:$("description").value.trim(),image};
  const old=products;
  if(id) products=products.map(p=>p.id===Number(id)?item:p); else products.push(item);
  render();
