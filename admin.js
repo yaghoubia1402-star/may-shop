@@ -122,6 +122,8 @@ async function loadOrders(){
  const list=$("ordersList");
  list.innerHTML="<p>در حال دریافت سفارش‌ها...</p>";
  try{
+  const health=await api("/api/health");
+  if(!health.storage) throw new Error("ORDERS_KV به Worker متصل نیست.");
   const data=await api("/api/orders");
   orders=Array.isArray(data.orders)?data.orders:[];
   renderOrders();

@@ -16,7 +16,7 @@ const json = (data, status=200) => new Response(JSON.stringify(data), {
 
 async function readJSON(env, key, fallback) {
   const store = env.ORDERS_KV || env.MAY_DATA;
-  if (!store) return fallback;
+  if (!store) throw new Error("اتصال ORDERS_KV در Cloudflare فعال نیست.");
   try {
     const raw = await store.get(key);
     return raw ? JSON.parse(raw) : fallback;
@@ -27,7 +27,7 @@ async function readJSON(env, key, fallback) {
 
 async function writeJSON(env, key, value) {
   const store = env.ORDERS_KV || env.MAY_DATA;
-  if (!store) throw new Error("ORDERS_KV binding is not configured");
+  if (!store) throw new Error("اتصال ORDERS_KV در Cloudflare فعال نیست.");
   await store.put(key, JSON.stringify(value));
 }
 
@@ -67,7 +67,7 @@ export default {
         if (url.pathname === "/api/orders") {
           if (request.method === "GET") {
             const orders = await readJSON(env, ORDER_KEY, []);
-            return json({ok:true, orders:orders.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)))});
+            return json({ok:true, orders:[...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))), count:orders.length});
           }
 
           if (request.method === "POST") {
