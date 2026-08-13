@@ -34,11 +34,12 @@ const json = (data, status=200) => new Response(JSON.stringify(data), {
 async function readJSON(env, key, fallback) {
   const store = env.ORDERS_KV || env.MAY_DATA;
   if (!store) throw new Error("اتصال ORDERS_KV در Cloudflare فعال نیست.");
+  const raw = await store.get(key);
+  if (!raw) return fallback;
   try {
-    const raw = await store.get(key);
-    return raw ? JSON.parse(raw) : fallback;
+    return JSON.parse(raw);
   } catch {
-    return fallback;
+    throw new Error("داده ذخیره‌شده در ORDERS_KV قابل خواندن نیست.");
   }
 }
 
@@ -183,16 +184,22 @@ export default {
       }
     }
 
-    if (url.pathname === "/admin") {
-      // /admin is always the login gate; this prevents an old browser session
-      // from silently opening the management panel.
-      return new Response(`<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ورود مدیریت MAY.SHOP</title><style>body{font-family:sans-serif;background:#f6f6f6;display:grid;place-items:center;min-height:100vh;margin:0}.box{background:#fff;padding:28px;border-radius:18px;box-shadow:0 10px 30px #0001;width:min(90%,360px)}input,button{width:100%;padding:13px;margin-top:10px;box-sizing:border-box;border-radius:10px;border:1px solid #ddd}button{cursor:pointer;background:#111;color:#fff}.err{color:#b00020;margin-top:10px}</style><div class="box"><h2>MAY.SHOP</h2><p>ورود مدیریت فروشگاه</p><input id="p" type="password" autocomplete="current-password" placeholder="رمز مدیریت"><button onclick="login()">ورود</button><div id="e" class="err"></div></div><script>async function login(){const e=document.getElementById("e");e.textContent="";const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify({password:document.getElementById("p").value})});const d=await r.json();if(d.ok)location.href="/admin.html";else e.textContent=d.error||"ورود ناموفق بود."}</script></html>`, {headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store","set-cookie":`${ADMIN_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`}});
+    if (url.pathname === "/admin" || url.pathname === "/admin.html") {
+      return new Response(`<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ورود مدیریت MAY.SHOP</title><style>body{font-family:sans-serif;background:#f6f6f6;display:grid;place-items:center;min-height:100vh;margin:0}.box{background:#fff;padding:28px;border-radius:18px;box-shadow:0 10px 30px #0001;width:min(90%,360px)}input,button{width:100%;padding:13px;margin-top:10px;box-sizing:border-box;border-radius:10px;border:1px solid #ddd}button{cursor:pointer;background:#111;color:#fff}.err{color:#b00020;margin-top:10px}</style><div class="box"><h2>MAY.SHOP</h2><p>ورود مدیریت فروشگاه</p><input id="p" type="password" autocomplete="current-password" placeholder="رمز مدیریت"><button onclick="login()">ورود</button><div id="e" class="err"></div></div><script>async function login(){const e=document.getElementById("e");e.textContent="";try{const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},credentials:"same-origin",body:JSON.stringify({password:document.getElementById("p").value})});const d=await r.json();if(d.ok)location.replace("/admin-panel");else e.textContent=d.error||"ورود ناموفق بود."}catch(x){e.textContent="خطا در اتصال به سرور."}}</script></html>`, {
+        headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}
+      });
     }
-    if (url.pathname === "/admin.html") {
+
+    if (url.pathname === "/admin-panel") {
       if (!hasAdmin(request)) {
-        return new Response(`<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ورود مدیریت MAY.SHOP</title><style>body{font-family:sans-serif;background:#f6f6f6;display:grid;place-items:center;min-height:100vh;margin:0}.box{background:#fff;padding:28px;border-radius:18px;box-shadow:0 10px 30px #0001;width:min(90%,360px)}input,button{width:100%;padding:13px;margin-top:10px;box-sizing:border-box;border-radius:10px;border:1px solid #ddd}button{cursor:pointer;background:#111;color:#fff}.err{color:#b00020;margin-top:10px}</style><div class="box"><h2>MAY.SHOP</h2><p>ورود مدیریت فروشگاه</p><input id="p" type="password" placeholder="رمز مدیریت"><button onclick="login()">ورود</button><div id="e" class="err"></div></div><script>async function login(){const e=document.getElementById("e");e.textContent="";const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password:document.getElementById("p").value})});const d=await r.json();if(d.ok)location.href="/admin.html";else e.textContent=d.error||"ورود ناموفق بود."}</script></html>`, {headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
+        return Response.redirect(new URL("/admin", request.url).toString(), 302);
       }
+      if (env.ASSETS) {
+        return env.ASSETS.fetch(new Request(new URL("/admin.html", request.url), request));
+      }
+      return new Response("MAY.SHOP", {headers:{"content-type":"text/plain; charset=utf-8"}});
     }
+
     if (env.ASSETS) return env.ASSETS.fetch(request);
     return new Response("MAY.SHOP", {headers:{"content-type":"text/plain; charset=utf-8"}});
   }
