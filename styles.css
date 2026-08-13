@@ -3,3 +3,5 @@
 .full{width:100%;margin-bottom:14px}.secondary,.edit{border:0;background:#eee;color:#222;padding:10px 14px;border-radius:10px;cursor:pointer}.actions{display:flex;gap:10px;align-items:center}.remove{border:0;background:#fee;color:#900;padding:7px 9px;border-radius:8px;cursor:pointer}.qty b{min-width:22px;text-align:center}@media(max-width:650px){.cart-line{flex-wrap:wrap}.cart-line .grow{min-width:45%}.remove{margin-right:auto}}
 
 .send-title{font-weight:700;margin:14px 0 10px}.send-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.send-grid button{border:0;border-radius:10px;padding:12px;cursor:pointer;background:#f2f2f2;font-weight:700}.send-grid button:hover{filter:brightness(.96)}
+
+#orderForm{margin-top:14px}.show-form{display:block!important}

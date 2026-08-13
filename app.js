@@ -105,7 +105,13 @@ $("search").addEventListener("input",renderProducts);
 $("category").addEventListener("change",renderProducts);
 $("cartBtn").addEventListener("click",openCart);
 $("checkoutBtn").addEventListener("click",()=>{
-  $("orderForm").scrollIntoView({behavior:"smooth",block:"start"});
+  if(!cart.length){
+    renderCart();
+    return;
+  }
+  const form=$("orderForm");
+  form.classList.add("show-form");
+  setTimeout(()=>form.querySelector("#customerName").focus(),50);
 });
 function sendOrder(platform){
   if(!cart.length){$("orderResult").textContent="سبد خرید خالی است.";return;}
