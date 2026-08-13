@@ -170,8 +170,10 @@ async function deleteOrder(id){
 }
 
 $("refreshOrders").onclick=loadOrders;
-$("shopPhone").value=localStorage.getItem("may_phone")||"";
-$("saveSettings").onclick=()=>{localStorage.setItem("may_phone",$("shopPhone").value.trim());alert("تنظیمات محلی ذخیره شد. شماره اصلی سایت در config.js تنظیم شده است.")};
+async function logout(){
+  await fetch(API_BASE+"/api/admin/logout",{method:"POST"});
+  location.href="/admin";
+}
 
 render();
 loadProducts();

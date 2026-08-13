@@ -131,17 +131,12 @@ $("checkoutBtn").addEventListener("click",()=>{
   setTimeout(()=>form.querySelector("#customerName").focus(),50);
 });
 
-function sendOrder(platform){
-  const text=$("orderResult").dataset.orderText||"";
-  const raw=String(SHOP_CONFIG[platform]||"").replace(/\D/g,"");
-  if(!raw){$("orderResult").textContent="این روش تماس هنوز تنظیم نشده است.";return;}
-  let url="";
-  if(platform==="whatsapp") url="https://wa.me/"+raw+"?text="+encodeURIComponent(text);
-  else if(platform==="eitaa") url="https://eitaa.com/"+raw;
-  else if(platform==="bale") url="https://ble.ir/"+raw;
-  else if(platform==="rubika") url="https://rubika.ir/"+raw;
-  window.open(url,"_blank");
+function openBale(){
+  const phone = "09122468958";
+  const text = "سلام، شماره پیگیری واریز سفارش MAY.SHOP را ارسال می‌کنم.";
+  window.open("https://ble.ir/"+phone+"?text="+encodeURIComponent(text),"_blank");
 }
+
 
 $("orderForm").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -163,16 +158,21 @@ $("orderForm").addEventListener("submit",async e=>{
     const out=await r.json();
     if(!r.ok||!out.ok) throw new Error(out.error||"ثبت سفارش ناموفق بود.");
 
-    result.dataset.orderText=buildOrderText(data);
-    result.innerHTML=`<div class="success-box">✅ سفارش با موفقیت در مدیریت ثبت شد.<br><small>کد سفارش: <b>${safe(out.order.id)}</b></small></div>
-    <div class="send-title">ارسال سفارش در پلتفرم‌ها</div>
-    <div class="send-grid">
-      <button type="button" onclick="sendOrder('whatsapp')">🟢 واتساپ</button>
-      <button type="button" onclick="sendOrder('bale')">🔵 بله</button>
-      <button type="button" onclick="sendOrder('eitaa')">🟠 ایتا</button>
-      <button type="button" onclick="sendOrder('rubika')">🟣 روبیکا</button>
+    const created = new Date(out.order.createdAt);
+    result.innerHTML=`<div class="success-box">
+      <h3>✅ سفارش شما با موفقیت ثبت شد</h3>
+      <p>کد سفارش: <b>${safe(out.order.id)}</b></p>
+      <p>زمان ثبت سفارش: <b>${safe(created.toLocaleString("fa-IR"))}</b></p>
+      <p>مبلغ قابل پرداخت: <b>${money(out.order.total)}</b></p>
     </div>
-    <small>شماره فروشگاه: 0912 246 8958</small>`;
+    <div class="payment-box">
+      <h3>💳 پرداخت سفارش</h3>
+      <p>برای نهایی شدن سفارش، مبلغ بالا را به کارت زیر واریز کنید:</p>
+      <div class="card-number">6037&nbsp;9973&nbsp;6131&nbsp;3746</div>
+      <p><b>بانک ملی</b><br>به نام <b>محمد علی یعقوبی‌زاده</b></p>
+      <p>پس از واریز، <b>شماره پیگیری واریز</b> را در پلتفرم <b>بله</b> برای ما ارسال کنید.</p>
+      <button type="button" class="primary full" onclick="openBale()">🔵 ارسال شماره پیگیری در بله</button>
+    </div>`;
 
     cart=[];
     save();

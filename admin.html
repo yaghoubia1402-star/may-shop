@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MAY.SHOP | مدیریت</title><link rel="stylesheet" href="styles.css"></head>
-<body><header class="topbar"><div class="brand">MAY<span>.SHOP</span></div><nav><a href="index.html">فروشگاه</a><a class="active" href="admin.html">مدیریت</a></nav></header>
+<body><header class="topbar"><div class="brand">MAY<span>.SHOP</span></div><nav><a href="index.html">فروشگاه</a><a class="active" href="admin.html">مدیریت</a><button type="button" onclick="logout()">خروج</button></nav></header>
 <main class="container"><section class="hero small"><h1>مدیریت فروشگاه</h1><p>مدیریت محصولات و سفارش‌های مشتریان</p><div id="adminStatus" class="status"></div></section>
 <section class="panel"><h2 id="formTitle">افزودن محصول</h2><form id="productForm" class="form-grid">
 <input type="hidden" id="editId"><input id="name" required placeholder="نام محصول"><input id="price" required type="number" min="0" placeholder="قیمت (تومان)">
@@ -15,6 +15,5 @@
 <div class="order-tools"><button id="refreshOrders" class="secondary">🔄 به‌روزرسانی سفارش‌ها</button><span class="muted">سفارش‌ها هر ۱۵ ثانیه هم خودکار بررسی می‌شوند.</span></div>
 <div id="ordersList"><p class="muted">در حال دریافت...</p></div>
 </section>
-<section class="panel"><h2>تنظیمات</h2><p class="muted">سفارش‌های ثبت‌شده از فروشگاه در بخش «سفارش‌های مشتریان» نمایش داده می‌شوند. برای ذخیره مشترک، اتصال KV با نام <b>MAY_DATA</b> باید در Cloudflare فعال باشد.</p>
-<input id="shopPhone" placeholder="شماره تماس/واتساپ"><button id="saveSettings" class="primary">ذخیره</button></section>
-</main><footer>MAY.SHOP — مدیریت</footer><script src="admin.js"></script></body></html>
+
+</main><footer>MAY.SHOP — مدیریت</footer><script src="config.js"></script><script src="admin.js"></script></body></html>

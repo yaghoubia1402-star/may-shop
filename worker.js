@@ -8,6 +8,17 @@ const DEFAULT_PRODUCTS = [
 const PRODUCT_KEY = "products";
 const ORDER_KEY = "orders";
 const MAX_ORDERS = 500;
+const ADMIN_PASSWORD = "MAY@09122468958#Admin";
+const ADMIN_COOKIE = "MAY_ADMIN_AUTH";
+const ADMIN_TOKEN = "MAYSHOP-ADMIN-2026";
+
+function hasAdmin(request) {
+  const cookie = request.headers.get("cookie") || "";
+  return cookie.split(";").some(x => x.trim() === ADMIN_COOKIE + "=" + ADMIN_TOKEN);
+}
+function adminResponse() {
+  return json({ok:false,error:"دسترسی مدیریت نیاز به ورود دارد."},401);
+}
 
 const json = (data, status=200) => new Response(JSON.stringify(data), {
   status,
@@ -57,7 +68,36 @@ export default {
           return json({ok:true, storage:!!(env.ORDERS_KV || env.MAY_DATA)});
         }
 
+        if (url.pathname === "/api/admin/login" && request.method === "POST") {
+          const body = await request.json().catch(()=>({}));
+          if (String(body.password || "") !== ADMIN_PASSWORD) {
+            return json({ok:false,error:"رمز مدیریت نادرست است."},401);
+          }
+          return new Response(JSON.stringify({ok:true}), {
+            headers: {
+              "content-type":"application/json; charset=utf-8",
+              "cache-control":"no-store",
+              "set-cookie": `${ADMIN_COOKIE}=${ADMIN_TOKEN}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`,
+              "access-control-allow-origin":"*",
+              "access-control-allow-methods":"GET,POST,PUT,PATCH,DELETE,OPTIONS",
+              "access-control-allow-headers":"content-type,accept"
+            }
+          });
+        }
+
+        if (url.pathname === "/api/admin/logout" && request.method === "POST") {
+          return new Response(JSON.stringify({ok:true}), {
+            headers: {
+              "content-type":"application/json; charset=utf-8",
+              "cache-control":"no-store",
+              "set-cookie": `${ADMIN_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`,
+              "access-control-allow-origin":"*"
+            }
+          });
+        }
+
         if (url.pathname === "/api/products") {
+          if (request.method !== "GET" && !hasAdmin(request)) return adminResponse();
           if (request.method === "GET") {
             const products = await readJSON(env, PRODUCT_KEY, DEFAULT_PRODUCTS);
             return json({ok:true, products});
@@ -72,6 +112,7 @@ export default {
         }
 
         if (url.pathname === "/api/orders") {
+          if (request.method !== "POST" && !hasAdmin(request)) return adminResponse();
           if (request.method === "GET") {
             const orders = await readJSON(env, ORDER_KEY, []);
             return json({ok:true, orders:[...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))), count:orders.length});
@@ -137,6 +178,11 @@ export default {
       }
     }
 
+    if (url.pathname === "/admin" || url.pathname === "/admin.html") {
+      if (!hasAdmin(request)) {
+        return new Response(`<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ورود مدیریت MAY.SHOP</title><style>body{font-family:sans-serif;background:#f6f6f6;display:grid;place-items:center;min-height:100vh;margin:0}.box{background:#fff;padding:28px;border-radius:18px;box-shadow:0 10px 30px #0001;width:min(90%,360px)}input,button{width:100%;padding:13px;margin-top:10px;box-sizing:border-box;border-radius:10px;border:1px solid #ddd}button{cursor:pointer;background:#111;color:#fff}.err{color:#b00020;margin-top:10px}</style><div class="box"><h2>MAY.SHOP</h2><p>ورود مدیریت فروشگاه</p><input id="p" type="password" placeholder="رمز مدیریت"><button onclick="login()">ورود</button><div id="e" class="err"></div></div><script>async function login(){const e=document.getElementById("e");e.textContent="";const r=await fetch("/api/admin/login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({password:document.getElementById("p").value})});const d=await r.json();if(d.ok)location.href="/admin.html";else e.textContent=d.error||"ورود ناموفق بود."}</script></html>`, {headers:{"content-type":"text/html; charset=utf-8","cache-control":"no-store"}});
+      }
+    }
     if (env.ASSETS) return env.ASSETS.fetch(request);
     return new Response("MAY.SHOP", {headers:{"content-type":"text/plain; charset=utf-8"}});
   }
