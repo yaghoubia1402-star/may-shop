@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAY.SHOP | فروشگاه</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar"><div class="brand">MAY<span>.SHOP</span></div>
+<nav><a class="active" href="index.html">فروشگاه</a><a href="admin.html">مدیریت</a></nav></header>
+<main class="container">
+<section class="hero"><h1>MAY.SHOP</h1><p>فروشگاه محصولات، ادویه‌جات، زعفران و خوراکی‌های خوش‌طعم</p></section>
+<div class="toolbar"><input id="search" placeholder="جستجوی محصول..."><select id="category"><option value="">همه دسته‌ها</option></select><button id="cartBtn" class="cart-btn">🛒 سبد خرید <b id="cartCount">۰</b></button></div>
+<section id="products" class="grid"></section><div id="empty" class="empty hidden">محصولی پیدا نشد.</div>
+</main>
+<div id="cartModal" class="modal hidden">
+<div class="modal-box"><button class="close" onclick="closeCart()">×</button><h2>سبد خرید</h2>
+<div id="cartItems"></div><div class="total">جمع کل: <b id="cartTotal">۰ تومان</b></div>
+<button id="checkoutBtn" class="primary full">ادامه و ثبت سفارش</button>
+<form id="orderForm"><h3>اطلاعات سفارش</h3>
+<input id="customerName" required placeholder="نام و نام خانوادگی">
+<input id="phone" required inputmode="tel" placeholder="شماره تماس">
+<textarea id="address" required placeholder="آدرس کامل"></textarea>
+<button class="primary">ارسال سفارش در واتساپ</button></form>
+<div id="orderResult"></div></div></div>
+<footer>MAY.SHOP — فروشگاه شما</footer>
+<script src="config.js"></script><script src="app.js"></script>
+</body></html>

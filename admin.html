@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAY.SHOP | مدیریت</title><link rel="stylesheet" href="styles.css"></head>
+<body><header class="topbar"><div class="brand">MAY<span>.SHOP</span></div><nav><a href="index.html">فروشگاه</a><a class="active" href="admin.html">مدیریت</a></nav></header>
+<main class="container"><section class="hero small"><h1>مدیریت فروشگاه</h1><p>افزودن، ویرایش و حذف محصولات</p></section>
+<section class="panel"><h2 id="formTitle">افزودن محصول</h2><form id="productForm" class="form-grid">
+<input type="hidden" id="editId"><input id="name" required placeholder="نام محصول"><input id="price" required type="number" min="0" placeholder="قیمت (تومان)">
+<input id="cat" required placeholder="دسته‌بندی"><input id="imageUrl" placeholder="لینک عکس (اختیاری)">
+<label class="file">یا انتخاب عکس از گوشی<input id="imageFile" type="file" accept="image/*"></label>
+<div class="actions"><button id="submitBtn" class="primary">افزودن محصول</button><button type="button" id="cancelEdit" class="secondary">پاک کردن فرم</button></div>
+</form></section>
+<section class="panel"><h2>محصولات فعلی</h2><div id="adminProducts"></div></section>
+<section class="panel"><h2>تنظیمات</h2><p class="muted">ارسال سفارش سایت از طریق واتساپ انجام می‌شود. شماره اصلی سایت باید در فایل <b>config.js</b> وارد شود.</p>
+<input id="shopPhone" placeholder="شماره تماس/واتساپ"><button id="saveSettings" class="primary">ذخیره</button></section>
+</main><footer>MAY.SHOP — مدیریت</footer><script src="admin.js"></script></body></html>
