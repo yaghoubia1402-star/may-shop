@@ -15,9 +15,10 @@ const json = (data, status=200) => new Response(JSON.stringify(data), {
 });
 
 async function readJSON(env, key, fallback) {
-  if (!env.MAY_DATA) return fallback;
+  const store = env.ORDERS_KV || env.MAY_DATA;
+  if (!store) return fallback;
   try {
-    const raw = await env.MAY_DATA.get(key);
+    const raw = await store.get(key);
     return raw ? JSON.parse(raw) : fallback;
   } catch {
     return fallback;
@@ -25,8 +26,9 @@ async function readJSON(env, key, fallback) {
 }
 
 async function writeJSON(env, key, value) {
-  if (!env.MAY_DATA) throw new Error("MAY_DATA binding is not configured");
-  await env.MAY_DATA.put(key, JSON.stringify(value));
+  const store = env.ORDERS_KV || env.MAY_DATA;
+  if (!store) throw new Error("ORDERS_KV binding is not configured");
+  await store.put(key, JSON.stringify(value));
 }
 
 function normalizeProduct(p, index=0) {
@@ -45,7 +47,7 @@ export default {
     if (url.pathname.startsWith("/api/")) {
       try {
         if (url.pathname === "/api/health" && request.method === "GET") {
-          return json({ok:true, storage:!!env.MAY_DATA});
+          return json({ok:true, storage:!!(env.ORDERS_KV || env.MAY_DATA)});
         }
 
         if (url.pathname === "/api/products") {
